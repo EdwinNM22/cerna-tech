@@ -1,4 +1,4 @@
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/components/theme-provider'
 import { Outlet, useLocation } from 'react-router-dom'
 import ClickSpark from '@/components/ClickSpark'
 import { usePrefersReducedEffects } from '@/hooks/usePrefersReducedEffects'
@@ -12,13 +12,13 @@ function LayoutShell() {
   const isHome = pathname === '/'
 
   return (
-    <div className="flex min-h-svh w-full flex-col overflow-x-hidden">
+    <div className="flex min-h-svh w-full flex-col overflow-x-clip">
       <ScrollToTop />
       <Header />
       <main className={cn('w-full flex-1', !isHome && 'pt-[5.25rem]')}>
         <Outlet />
       </main>
-      <Footer />
+      <Footer immersive={isHome} />
     </div>
   )
 }

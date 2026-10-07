@@ -185,6 +185,10 @@ export type SolutionCta = {
   id: string
   title: string
   description: string
+  /** Línea corta bajo el título de módulo (vista inmersiva desktop). */
+  tagline: string
+  /** Párrafo extra de contexto (vista inmersiva desktop). */
+  detail: string
   highlights: string[]
   buttonLabel: string
   buttonTo: string
@@ -203,8 +207,11 @@ export const solutionEcosystemItems: SolutionCta[] = [
   {
     id: 'workforce',
     title: 'Gestión de trabajadores',
+    tagline: 'Personas, turnos y permisos en un solo lugar',
     description:
       'Centraliza equipos, turnos, permisos y seguimiento operativo en un solo panel. Ideal cuando el Excel ya no alcanza y necesitas trazabilidad por persona, área o proyecto.',
+    detail:
+      'Definimos flujos de aprobación, historial por colaborador y reportes listos para nómina o dirección. Tu equipo deja de perder tiempo en chats y hojas sueltas.',
     highlights: [
       'Roles, permisos y auditoría',
       'Asistencia, turnos y solicitudes',
@@ -219,8 +226,11 @@ export const solutionEcosystemItems: SolutionCta[] = [
   {
     id: 'inventory',
     title: 'Gestión de inventario',
+    tagline: 'Stock real, movimientos trazables, menos quiebres',
     description:
       'Control de existencias, entradas y salidas, alertas de stock mínimo y trazabilidad por producto o bodega. Pensado para retail, talleres, distribución o almacenes internos.',
+    detail:
+      'Cada entrada y salida queda registrada con responsable y motivo. Alertas automáticas antes del mínimo y vistas por bodega para compras y operación en piso.',
     highlights: [
       'Múltiples almacenes y categorías',
       'Kardex y movimientos en tiempo real',
@@ -235,8 +245,11 @@ export const solutionEcosystemItems: SolutionCta[] = [
   {
     id: 'business',
     title: 'Gestión de negocios',
+    tagline: 'Ventas, cobros y KPIs sin reconciliar a mano',
     description:
       'Dashboard administrativo con ventas, cobros, gastos y reportes claros para decidir con datos. Unifica lo que hoy está repartido entre hojas sueltas y herramientas que no hablan entre sí.',
+    detail:
+      'Consolidamos ingresos, cuentas por cobrar y gastos recurrentes en tableros que entiende dirección y contabilidad. Exportaciones y cortes por periodo listos para revisión.',
     highlights: [
       'Panel ejecutivo y KPIs',
       'Facturación y cuentas por cobrar',
@@ -251,8 +264,11 @@ export const solutionEcosystemItems: SolutionCta[] = [
   {
     id: 'scheduling',
     title: 'Agendas inteligentes',
+    tagline: 'Citas confirmadas, menos ausencias',
     description:
       'Reservas, citas y calendarios compartidos con recordatorios automáticos. Reduce ausencias y libera a tu equipo de coordinar por chat o llamadas.',
+    detail:
+      'Calendarios por profesional, sala o recurso con reglas de disponibilidad. Recordatorios por correo o SMS y sincronización con tu sitio o app móvil.',
     highlights: [
       'Calendarios por profesional o recurso',
       'Confirmaciones y recordatorios',
@@ -267,8 +283,11 @@ export const solutionEcosystemItems: SolutionCta[] = [
   {
     id: 'integrations',
     title: 'Integraciones y automatización',
+    tagline: 'Tus sistemas hablan entre sí solos',
     description:
       'Conectamos tu ecosistema con pagos, ERP, CRM, correo y mensajería. Los datos fluyen sin copiar y pegar entre sistemas.',
+    detail:
+      'APIs, webhooks y jobs programados con reintentos y logs. Cuando algo falla, sabes qué registro falló y por qué — sin cajas negras.',
     highlights: [
       'APIs y webhooks a medida',
       'Sincronización programada',

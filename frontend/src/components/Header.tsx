@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
-import { useScrolled } from '@/hooks/useScrolled'
+import { useLenis } from 'lenis/react'
+import { useHeaderState } from '@/hooks/useHeaderState'
 import { cn } from '@/lib/utils'
 
 const navItems: { to: string; label: string; end?: boolean }[] = [
@@ -15,10 +16,11 @@ const navItems: { to: string; label: string; end?: boolean }[] = [
 
 export function Header() {
   const { pathname } = useLocation()
-  const scrolled = useScrolled()
+  const { hidden, overDark } = useHeaderState(pathname)
+  const lenis = useLenis()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const isHome = pathname === '/'
-  const onHero = isHome && !scrolled
+  // Cristal oscuro sobre secciones oscuras (hero, ecosistema y cola de Home).
+  const onHero = overDark
 
   useEffect(() => {
     setMobileOpen(false)
@@ -26,17 +28,20 @@ export function Header() {
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    if (mobileOpen) lenis?.stop()
     return () => {
       document.body.style.overflow = ''
+      lenis?.start()
     }
-  }, [mobileOpen])
+  }, [mobileOpen, lenis])
 
   return (
     <>
-      <header className="pointer-events-none fixed top-0 right-0 left-0 z-50 w-full px-4 pt-4 sm:px-6">
+      <header className="pointer-events-none fixed top-0 right-0 left-0 z-50 w-full px-3 pt-2 sm:px-6 sm:pt-4">
         <div
           className={cn(
-            'pointer-events-auto mx-auto flex h-14 max-w-6xl items-center gap-4 rounded-2xl border px-3 shadow-lg backdrop-blur-xl transition-all duration-300 sm:px-4',
+            'pointer-events-auto mx-auto flex h-14 max-w-6xl items-center gap-4 rounded-2xl border px-3 shadow-lg backdrop-blur-xl transition-[transform,opacity,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] focus-within:translate-y-0 focus-within:opacity-100 sm:px-4',
+            hidden && !mobileOpen && '-translate-y-[calc(100%+1rem)] opacity-0',
             onHero
               ? 'border-white/15 bg-slate-950/50 shadow-slate-950/40'
               : 'border-border/70 bg-background/80 shadow-black/5',
@@ -60,7 +65,7 @@ export function Header() {
             >
               CT
             </span>
-            <span className="hidden font-heading text-[0.95rem] font-semibold tracking-tight sm:inline">
+            <span className="font-heading text-sm font-semibold tracking-tight sm:text-[0.95rem]">
               Cerna Tech
             </span>
           </NavLink>
@@ -151,7 +156,7 @@ export function Header() {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            className="fixed inset-0 z-[60] md:hidden"
+            className="fixed inset-0 z-[49] md:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -172,14 +177,23 @@ export function Header() {
             >
               <ul className="flex flex-col gap-1">
                 {[...navItems, { to: '/contacto', label: 'Contacto' }].map(
-                  ({ to, label, end }) => (
-                    <li key={to}>
+                  ({ to, label, end }, i) => (
+                    <motion.li
+                      key={to}
+                      initial={{ opacity: 0, x: -14 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        delay: 0.06 + i * 0.05,
+                        duration: 0.35,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                    >
                       <NavLink
                         to={to}
                         end={end}
                         className={({ isActive }) =>
                           cn(
-                            'block rounded-xl px-4 py-3 text-base font-medium transition-colors',
+                            'flex items-baseline gap-3 rounded-xl px-4 py-3 text-lg font-medium transition-colors',
                             isActive
                               ? 'bg-primary/10 text-primary'
                               : 'text-foreground hover:bg-muted',
@@ -187,9 +201,12 @@ export function Header() {
                         }
                         onClick={() => setMobileOpen(false)}
                       >
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
                         {label}
                       </NavLink>
-                    </li>
+                    </motion.li>
                   ),
                 )}
               </ul>

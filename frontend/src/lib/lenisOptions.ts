@@ -1,25 +1,27 @@
 import type { LenisOptions } from 'lenis'
 
-/** Curva por defecto de Lenis — inercia al soltar la rueda. */
+/** Curva por defecto de Lenis para `scrollTo` programático (anclas, rutas). */
 export const lenisEasing = (t: number) =>
   Math.min(1, 1.001 - 2 ** (-10 * t))
 
-export function createLenisOptions(isCoarsePointer: boolean): LenisOptions {
+/**
+ * Configuración cercana a lenis.dev: inercia suave por `lerp`, sin multiplicadores
+ * agresivos y sin tocar el scroll (nada de stop/start).
+ *
+ * `autoRaf: false` → el reloj lo pone `gsap.ticker` (ver SmoothScrollProvider),
+ * así Lenis, ScrollTrigger y los tweens comparten el mismo frame.
+ */
+export function createLenisOptions(): LenisOptions {
   return {
-    autoRaf: true,
+    autoRaf: false,
     smoothWheel: true,
-    syncTouch: isCoarsePointer,
-    syncTouchLerp: 0.1,
-    touchMultiplier: 1.15,
-    wheelMultiplier: 1.25,
-    lerp: isCoarsePointer ? 0.12 : 0.055,
+    wheelMultiplier: 1,
+    lerp: 0.09,
     easing: lenisEasing,
     infinite: false,
     anchors: true,
-    autoToggle: true,
     autoResize: true,
     overscroll: true,
-    respectReducedMotion: true,
     prevent: (node) => Boolean(node.closest('[data-lenis-prevent]')),
   }
 }

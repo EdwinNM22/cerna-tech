@@ -8,6 +8,8 @@ type TechLogoLoopProps = {
   className?: string
   logoHeight?: number
   speed?: number
+  direction?: 'left' | 'right'
+  fadeOutColor?: string
 }
 
 function getLabel(item: LogoItem): string {
@@ -47,16 +49,19 @@ export function TechLogoLoop({
   className,
   logoHeight = 36,
   speed = 90,
+  direction = 'left',
+  fadeOutColor,
 }: TechLogoLoopProps) {
   return (
     <LogoLoop
       logos={devWebLogos}
       speed={speed}
-      direction="left"
+      direction={direction}
       logoHeight={logoHeight}
       gap={40}
       pauseOnHover
       fadeOut
+      fadeOutColor={fadeOutColor}
       scaleOnHover
       renderItem={(item) => renderLogoItem(item)}
       ariaLabel="Tecnologías de desarrollo web"

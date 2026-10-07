@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from 'motion/react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { LenisHeroParallax } from '@/components/LenisHeroParallax'
 import Particles from '@/components/Particles'
@@ -7,6 +8,11 @@ import { MorphingText } from '@/components/ui/morphing-text'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
 import { usePrefersReducedEffects } from '@/hooks/usePrefersReducedEffects'
 import { heroMorphingTexts } from '@/data/siteContent'
+import {
+  LENIS_HERO_GRADIENT_LIGHT,
+  LENIS_HERO_PARALLAX_BG,
+  LENIS_HERO_PARALLAX_FG,
+} from '@/lib/lenisHeroLayout'
 import { cn } from '@/lib/utils'
 
 const HERO_IMAGE =
@@ -18,8 +24,11 @@ export function HomeHero() {
   const showParticles = !reduceEffects && !reduceMotion
 
   return (
-    <section className="relative min-h-svh w-full overflow-hidden">
-      <LenisHeroParallax className="absolute inset-0" strength={0.22}>
+    <section data-header-dark className="relative w-full overflow-hidden max-md:min-h-0 md:min-h-svh">
+      <LenisHeroParallax
+        className="absolute inset-0"
+        strength={LENIS_HERO_PARALLAX_BG}
+      >
         <div className="absolute inset-0">
           {showParticles ? (
             <motion.img
@@ -49,7 +58,7 @@ export function HomeHero() {
       </LenisHeroParallax>
 
       <div
-        className="absolute inset-0 bg-linear-to-b from-slate-950/80 via-slate-950/65 to-background"
+        className={`absolute inset-0 ${LENIS_HERO_GRADIENT_LIGHT}`}
         aria-hidden
       />
 
@@ -79,8 +88,9 @@ export function HomeHero() {
       )}
 
       <LenisHeroParallax
-        strength={0.45}
-        className="relative z-10 mx-auto flex min-h-svh max-w-4xl flex-col items-center justify-center px-5 pt-[5.5rem] pb-16 text-center sm:pt-[6rem] md:pb-24"
+        strength={LENIS_HERO_PARALLAX_FG}
+        fadeOut
+        className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center justify-start px-5 pt-[4.25rem] pb-10 text-center max-md:min-h-0 sm:pt-[5rem] md:min-h-svh md:justify-center md:pt-[6rem] md:pb-24"
       >
         <motion.p
           className="mb-4 font-mono text-xs tracking-[0.25em] text-blue-300/90 uppercase md:text-sm"
@@ -92,7 +102,7 @@ export function HomeHero() {
         </motion.p>
 
         <motion.h1
-          className="text-balance w-full text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
+          className="text-balance w-full text-3xl leading-tight font-semibold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
           initial={reduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.08 }}
@@ -123,7 +133,7 @@ export function HomeHero() {
         </motion.h1>
 
         <motion.p
-          className="mt-6 max-w-2xl text-base text-slate-200 md:text-lg"
+          className="mt-4 max-w-2xl text-sm text-slate-200 sm:mt-6 sm:text-base md:text-lg"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -133,7 +143,7 @@ export function HomeHero() {
         </motion.p>
 
         <motion.div
-          className="mt-10 flex flex-wrap items-center justify-center gap-4"
+          className="mt-7 flex flex-wrap items-center justify-center gap-3 sm:mt-10 sm:gap-4"
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
@@ -158,6 +168,43 @@ export function HomeHero() {
           </Link>
         </motion.div>
       </LenisHeroParallax>
+
+      <HeroScrollCue />
     </section>
+  )
+}
+
+/** Indicador de scroll: invita a bajar y desaparece en cuanto se empieza. */
+function HeroScrollCue() {
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = ref.current
+      if (!el) return
+      el.style.opacity = String(Math.max(0, 1 - window.scrollY / 120))
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 bottom-8 z-10 hidden flex-col items-center gap-3 text-foreground/60 md:flex"
+    >
+      <span className="font-mono text-[0.65rem] tracking-[0.3em] uppercase">
+        Desliza
+      </span>
+      <span className="relative h-10 w-px overflow-hidden bg-foreground/20">
+        <motion.span
+          className="absolute inset-x-0 top-0 h-1/2 bg-foreground/70"
+          animate={{ y: ['-100%', '200%'] }}
+          transition={{ duration: 1.6, ease: 'easeInOut', repeat: Infinity }}
+        />
+      </span>
+    </div>
   )
 }

@@ -32,11 +32,15 @@ export interface AccordionGalleryProps {
   parallax?: number;
   tilt?: number;
   stagger?: number;
-  trigger?: 'hover' | 'click';
+  trigger?: 'hover' | 'click' | 'none';
   showLabels?: boolean;
   grayscale?: boolean;
   /** Ocupa el alto del viewport (sección edge-to-edge). */
   immersive?: boolean;
+  /** Llena el contenedor padre (p. ej. sticky + cabecera). */
+  fillContainer?: boolean;
+  /** Índice controlado externamente (scroll). */
+  activeIndex?: number;
   className?: string;
 }
 
@@ -68,6 +72,8 @@ const AccordionGallery = ({
   showLabels = true,
   grayscale = true,
   immersive = false,
+  fillContainer = false,
+  activeIndex: controlledIndex,
   className = ''
 }: AccordionGalleryProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -81,7 +87,20 @@ const AccordionGallery = ({
 
   const vertical = orientation === 'vertical';
   const count = items.length;
-  const [active, setActive] = useState(Math.min(Math.max(defaultIndex, 0), count - 1));
+  const [internalActive, setInternalActive] = useState(
+    Math.min(Math.max(defaultIndex, 0), count - 1),
+  );
+  const isControlled = controlledIndex !== undefined;
+  const active = isControlled
+    ? Math.min(Math.max(controlledIndex, 0), count - 1)
+    : internalActive;
+  const setActive = useCallback(
+    (next: number | ((prev: number) => number)) => {
+      if (isControlled) return;
+      setInternalActive(next);
+    },
+    [isControlled],
+  );
 
   const prefersReduced =
     typeof window !== 'undefined' && window.matchMedia
@@ -199,6 +218,7 @@ const AccordionGallery = ({
   };
 
   const handleClick = (i: number, e: MouseEvent) => {
+    if (trigger === 'none') return;
     if (i !== active) {
       e.preventDefault();
       setActive(i);
@@ -215,11 +235,13 @@ const AccordionGallery = ({
     }
   };
 
-  const rootHeightStyle: CSSProperties = immersive
-    ? { minHeight: '100svh', height: '100svh' }
-    : vertical
-      ? { height: `${Math.round(height * 1.6)}px` }
-      : { height: `${height}px` }
+  const rootHeightStyle: CSSProperties = fillContainer
+    ? { height: '100%', minHeight: 0, flex: '1 1 auto' }
+    : immersive
+      ? { minHeight: '100svh', height: '100svh' }
+      : vertical
+        ? { height: `${Math.round(height * 1.6)}px` }
+        : { height: `${height}px` }
 
   const effectiveRadius = immersive ? 0 : radius
   const effectiveGap = immersive ? Math.min(gap, 8) : gap
@@ -252,7 +274,9 @@ const AccordionGallery = ({
             href={item.link || undefined}
             onClick={e => handleClick(i, e)}
             onMouseEnter={() => handleEnter(i)}
-            onFocus={() => setActive(i)}
+            onFocus={() => {
+              if (trigger !== 'none') setActive(i);
+            }}
             onKeyDown={e => handleKeyDown(i, e)}
             role="listitem"
             tabIndex={0}
