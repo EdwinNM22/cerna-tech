@@ -249,6 +249,12 @@
     margin: 0;
     min-width: 320px;
     min-height: 100svh;
+    overflow-x: clip;
+  }
+
+  html[data-smooth-scroll='off'] {
+    scroll-behavior: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   h1,

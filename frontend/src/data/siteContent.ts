@@ -24,15 +24,6 @@ export const heroMorphingTexts = [
   'Software a medida',
 ]
 
-export const heroHighlights = [
-  'Sitios web corporativos',
-  'Tiendas en línea (e-commerce)',
-  'Aplicaciones web (SPA y SSR)',
-  'Apps móviles híbridas y nativas',
-  'Portales internos y dashboards',
-  'Integraciones con ERP y CRM',
-]
-
 export const softwareTopics = [
   {
     title: 'Desarrollo de software a medida',

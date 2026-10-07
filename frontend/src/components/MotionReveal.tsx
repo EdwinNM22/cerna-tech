@@ -1,5 +1,6 @@
-import { motion, type Variants } from 'motion/react'
+import { motion, useReducedMotion, type Variants } from 'motion/react'
 import type { ReactNode } from 'react'
+import { usePrefersReducedEffects } from '@/hooks/usePrefersReducedEffects'
 
 const defaultVariants: Variants = {
   hidden: { opacity: 0, y: 32 },
@@ -24,6 +25,13 @@ export function MotionReveal({
   as = 'div',
 }: MotionRevealProps) {
   const Component = motion[as]
+  const reduceMotion = useReducedMotion()
+  const reduceEffects = usePrefersReducedEffects()
+
+  if (reduceMotion || reduceEffects) {
+    const Static = as
+    return <Static className={className}>{children}</Static>
+  }
 
   return (
     <Component

@@ -1,6 +1,7 @@
 import { useLenis } from 'lenis/react'
-import { useRef, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { shouldUseSmoothScroll } from '@/lib/shouldUseSmoothScroll'
 
 type LenisHeroParallaxProps = {
   children: ReactNode
@@ -14,18 +15,24 @@ export function LenisHeroParallax({
   className,
   strength = 0.35,
 }: LenisHeroParallaxProps) {
+  const [parallaxEnabled] = useState(() => shouldUseSmoothScroll())
   const layerRef = useRef<HTMLDivElement>(null)
 
   useLenis(
     (lenis) => {
+      if (!parallaxEnabled) return
       const el = layerRef.current
       if (!el) return
       const y = lenis.scroll * strength
       el.style.transform = `translate3d(0, ${y}px, 0)`
     },
-    [],
+    [parallaxEnabled, strength],
     0,
   )
+
+  if (!parallaxEnabled) {
+    return <div className={className}>{children}</div>
+  }
 
   return (
     <div

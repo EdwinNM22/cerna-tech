@@ -5,32 +5,46 @@ import Particles from '@/components/Particles'
 import { AnimatedGradientText } from '@/components/ui/animated-gradient-text'
 import { MorphingText } from '@/components/ui/morphing-text'
 import { ShimmerButton } from '@/components/ui/shimmer-button'
-import { heroHighlights, heroMorphingTexts } from '@/data/siteContent'
+import { usePrefersReducedEffects } from '@/hooks/usePrefersReducedEffects'
+import { heroMorphingTexts } from '@/data/siteContent'
 import { cn } from '@/lib/utils'
 
 const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2400&q=85'
+  'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1600&q=75'
 
 export function HomeHero() {
   const reduceMotion = useReducedMotion()
+  const reduceEffects = usePrefersReducedEffects()
+  const showParticles = !reduceEffects && !reduceMotion
 
   return (
     <section className="relative min-h-svh w-full overflow-hidden">
       <LenisHeroParallax className="absolute inset-0" strength={0.22}>
         <div className="absolute inset-0">
-          <motion.img
-            src={HERO_IMAGE}
-            alt=""
-            aria-hidden
-            className="h-full w-full object-cover"
-            initial={reduceMotion ? false : { scale: 1.05 }}
-            animate={reduceMotion ? undefined : { scale: 1.15 }}
-            transition={
-              reduceMotion
-                ? undefined
-                : { duration: 22, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }
-            }
-          />
+          {showParticles ? (
+            <motion.img
+              src={HERO_IMAGE}
+              alt=""
+              aria-hidden
+              className="h-full w-full object-cover"
+              initial={{ scale: 1.05 }}
+              animate={{ scale: 1.12 }}
+              transition={{
+                duration: 22,
+                ease: 'linear',
+                repeat: Infinity,
+                repeatType: 'reverse',
+              }}
+            />
+          ) : (
+            <img
+              src={HERO_IMAGE}
+              alt=""
+              aria-hidden
+              className="h-full w-full object-cover"
+              fetchPriority="high"
+            />
+          )}
         </div>
       </LenisHeroParallax>
 
@@ -39,25 +53,30 @@ export function HomeHero() {
         aria-hidden
       />
 
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.5)_1px,transparent_1px)] [background-size:48px_48px]"
-        aria-hidden
-      />
-
-      <div className="absolute inset-0 z-[1] opacity-50">
-        <Particles
-          particleCount={120}
-          particleSpread={8}
-          speed={0.08}
-          particleColors={['#60a5fa', '#a78bfa', '#ffffff']}
-          moveParticlesOnHover
-          particleHoverFactor={0.35}
-          alphaParticles
-          particleBaseSize={90}
-          disableRotation={false}
-          className="h-full w-full"
+      {!reduceEffects && (
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.5)_1px,transparent_1px)] [background-size:48px_48px]"
+          aria-hidden
         />
-      </div>
+      )}
+
+      {showParticles && (
+        <div className="absolute inset-0 z-[1] opacity-50">
+          <Particles
+            particleCount={48}
+            particleSpread={8}
+            speed={0.08}
+            particleColors={['#60a5fa', '#a78bfa', '#ffffff']}
+            moveParticlesOnHover
+            particleHoverFactor={0.35}
+            alphaParticles
+            particleBaseSize={70}
+            disableRotation={false}
+            pixelRatio={1.25}
+            className="h-full w-full"
+          />
+        </div>
+      )}
 
       <LenisHeroParallax
         strength={0.45}
@@ -79,7 +98,7 @@ export function HomeHero() {
           transition={{ duration: 0.6, delay: 0.08 }}
         >
           <AnimatedGradientText
-            speed={1.1}
+            speed={reduceEffects ? 0 : 1.1}
             colorFrom="#93c5fd"
             colorTo="#c4b5fd"
             className="font-semibold"
@@ -88,7 +107,7 @@ export function HomeHero() {
           </AnimatedGradientText>
 
           <span className="mt-3 block w-full">
-            {reduceMotion ? (
+            {reduceMotion || reduceEffects ? (
               <span className="text-white/95">{heroMorphingTexts[0]}</span>
             ) : (
               <MorphingText
@@ -138,22 +157,6 @@ export function HomeHero() {
             Ver servicios
           </Link>
         </motion.div>
-
-        <motion.ul
-          className="mt-12 flex max-w-3xl flex-wrap justify-center gap-2"
-          initial={reduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          {heroHighlights.map((item) => (
-            <li
-              key={item}
-              className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-slate-100 backdrop-blur-sm md:text-sm"
-            >
-              {item}
-            </li>
-          ))}
-        </motion.ul>
       </LenisHeroParallax>
     </section>
   )

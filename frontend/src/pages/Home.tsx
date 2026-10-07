@@ -1,5 +1,5 @@
-import AccordionGallery from '@/components/AccordionGallery'
 import { HomeHero } from '@/components/HomeHero'
+import { HomePortfolioGallery } from '@/components/HomePortfolioGallery'
 import { PageContainer } from '@/components/PageContainer'
 import { FaqAccordion } from '@/components/marketing/FaqAccordion'
 import { StatsStrip } from '@/components/marketing/StatsStrip'
@@ -9,7 +9,7 @@ import { CtaDualImage } from '@/components/cta/CtaDualImage'
 import { CtaProcessSection } from '@/components/cta/CtaProcessSection'
 import { CtaSplitOffset } from '@/components/cta/CtaSplitOffset'
 import { TechLogoLoop } from '@/components/TechLogoLoop'
-import { serviceGalleryItems } from '@/data/accordionGalleryItems'
+import { usePrefersReducedEffects } from '@/hooks/usePrefersReducedEffects'
 import {
   ctaBuildTogether,
   ctaHowWeWork,
@@ -20,14 +20,14 @@ import {
 } from '@/data/siteContent'
 
 export function Home() {
+  const reduceEffects = usePrefersReducedEffects()
+
   return (
     <>
       <HomeHero />
 
-      <section className="relative isolate w-full overflow-hidden border-b border-border">
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-20 bg-linear-to-b from-background via-background/55 to-transparent px-5 pb-20 pt-10 md:px-8 md:pb-28 md:pt-14"
-        >
+      <section className="relative isolate w-full overflow-hidden border-b border-border py-10 md:py-0">
+        <div className="relative z-20 px-5 pb-8 md:pointer-events-none md:absolute md:inset-x-0 md:top-0 md:bg-linear-to-b md:from-background md:via-background/55 md:to-transparent md:px-8 md:pb-28 md:pt-14">
           <div className="mx-auto max-w-2xl text-center">
             <p className="font-mono text-[0.65rem] tracking-[0.28em] text-primary uppercase md:text-xs">
               Portafolio
@@ -36,32 +36,29 @@ export function Home() {
               Soluciones que desarrollamos
             </h2>
             <p className="mt-4 text-sm text-muted-foreground md:text-base">
-              Recorre cada panel — sitios, apps, tiendas e integraciones en un
-              solo vistazo.
+              <span className="md:hidden">
+                Toca cada tarjeta para ver sitios, apps, tiendas e integraciones.
+              </span>
+              <span className="hidden md:inline">
+                Recorre cada panel — sitios, apps, tiendas e integraciones en un
+                solo vistazo.
+              </span>
             </p>
           </div>
         </div>
 
-        <AccordionGallery
-          items={serviceGalleryItems}
-          defaultIndex={2}
-          immersive
-          expandRatio={0.58}
-          gap={6}
-          radius={0}
-          accentColor="#60a5fa"
-          overlayColor="#020617"
-          trigger="hover"
-          parallax={0.65}
-          className="w-full"
-        />
+        <HomePortfolioGallery />
       </section>
 
       <section className="w-full border-b border-border bg-muted/30 py-8 md:py-10">
         <p className="mb-6 text-center text-sm font-medium tracking-wide text-muted-foreground uppercase">
           Tecnologías de desarrollo web
         </p>
-        <TechLogoLoop className="w-full" logoHeight={40} speed={85} />
+        <TechLogoLoop
+          className="w-full"
+          logoHeight={reduceEffects ? 32 : 40}
+          speed={reduceEffects ? 35 : 85}
+        />
       </section>
 
       <SolutionEcosystemSection />

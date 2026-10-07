@@ -84,19 +84,38 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     [easing]
   );
 
+  const animationIdRef = useRef<number | null>(null);
+
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    return () => {
+      if (animationIdRef.current !== null) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
+      }
+    };
+  }, []);
 
-    let animationId: number;
+  const startDrawLoop = useCallback(() => {
+    if (animationIdRef.current !== null) return;
+    animationIdRef.current = requestAnimationFrame(function loop(timestamp) {
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext('2d');
+      if (!canvas || !ctx) {
+        animationIdRef.current = null;
+        return;
+      }
 
-    const draw = (timestamp: number) => {
+      if (sparksRef.current.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        animationIdRef.current = null;
+        return;
+      }
+
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
       }
-      ctx?.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       sparksRef.current = sparksRef.current.filter((spark: Spark) => {
         const elapsed = timestamp - spark.startTime;
@@ -125,15 +144,9 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
         return true;
       });
 
-      animationId = requestAnimationFrame(draw);
-    };
-
-    animationId = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
-  }, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
+      animationIdRef.current = requestAnimationFrame(loop);
+    });
+  }, [duration, easeFunc, extraScale, sparkColor, sparkRadius, sparkSize]);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     const canvas = canvasRef.current;
@@ -151,6 +164,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
     }));
 
     sparksRef.current.push(...newSparks);
+    startDrawLoop();
   };
 
   return (
